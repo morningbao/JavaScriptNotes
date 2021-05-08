@@ -1,5 +1,7 @@
 /**
  * 基础用法
+ * function 才自带有prototype属性
+ * function 被new生成对象
  */
 function Person() {}
 Person.prototype.age = 0
