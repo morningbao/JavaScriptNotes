@@ -116,3 +116,20 @@ console.log((a.foo, a.foo)()) // undefined
  * 3、对应值是Reference类型时，this会指向该Reference的基值(base value)(注，中间还有一些其他判断，这里略过)
  * 4、不符合条件的表达式，this都会指向window，严格模式为undefined
  */
+
+
+/**
+ * 有趣的例子
+ * 这里的this最终指向了arguments对象，arguments[0] 规范里等价与 arguments.0, 但是语法不允许这样写，但是逻辑是一致的
+ */
+ var length = 10;
+ function fn(){
+     console.log(this.length)
+ }
+ var obj = {
+     length: 5,
+     method: function(fn) {
+         arguments[0]()
+     }
+ }
+ obj.method(fn) //输出1
