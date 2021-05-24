@@ -116,6 +116,7 @@ Function.prototype.bindFn = function(thisArg) {
       var finalArgs = args.concat(boundArgs);
       /**
        * 这个判断不准确，因为当方法用apply、call来调用并传入一个先new出来的bound对象，就失效了，见例2
+       * 可以用   new.target === bound 判断
        */
       if(this instanceof bound){//new 调用
         /**
