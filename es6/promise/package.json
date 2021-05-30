@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "promises-aplus-tests": "^2.1.2"
+  },
+  "scripts": {
+    "test": "promises-aplus-tests test.js",
+    "index": "promises-aplus-tests index.js"
+  }
+}
