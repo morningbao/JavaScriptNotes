@@ -127,6 +127,105 @@ function resolvePromise(newPromise, result, resolve, reject) {
         resolve(result)
     }
 }
+MyPromise.prototype.catch = function (onRejected) {
+    this.then(null, onRejected)
+}
+MyPromise.prototype.finally = function (callback) {
+    return this.then(value =>  {
+        return MyPromise.resolve(callback()).then(() => {
+            return value
+        })
+    }, error => {
+        return MyPromise.resolve(callback()).then(() => {
+            throw error
+        })
+    })
+}
+MyPromise.all = (arr) => {
+    return new MyPromise((resolve, reject) => {
+        try {
+            const length = arr.length
+            if(length === 0) return resolve([])
+            let results = (new Array(length)).fill(null)
+            let count = 0
+            for (let i = 0; i < length; i++) {
+                arr[i].then(value => {
+                    results[i] = value
+                    count++
+                    if(count === length) resolve(results)
+                },reason => {
+                    reject(reason)
+                })
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+MyPromise.allSettled = (arr) => {
+    return new MyPromise((resolve, reject) => {
+        try {
+            const length = arr.length
+            if(length === 0) return resolve([])
+            let results = (new Array(length)).fill(null)
+            let count = 0
+            for (let i = 0; i < length; i++) {
+                arr[i].then(value => {
+                    results[i] = {
+                        state: 'fulfill',
+                        value: value
+                    }
+                    count++
+                    if(count === length) resolve(results)
+                },reason => {
+                    results[i] = {
+                        state: 'reject',
+                        reason: reason
+                    }
+                    if(count === length) resolve(results)
+                })
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+MyPromise.any = (arr) => {
+    return new MyPromise((resolve, reject) => {
+        try {
+            const length = arr.length
+            if(length === 0) return resolve([])
+            for (let i = 0; i < length; i++) {
+                arr[i].then(value => {
+                    resolve(value)
+                })
+            }
+        } catch (e) {
+            /**
+             * 就算是any，catch也是不能漏的，then()是可以执行失败的
+             */
+            reject(e)
+        }
+    })
+}
+MyPromise.race = (arr) => {
+    return new MyPromise((resolve, reject) => {
+        try {
+            const length = arr.length
+            if(length === 0) return resolve([])
+            for (let i = 0; i < length; i++) {
+                arr[i].then(value => {
+                    resolve(value)
+                },reason => {
+                    reject(reason)
+                })
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
 MyPromise.resolve = (value) => {
     if(value instanceof MyPromise) return value
     return new MyPromise((resolve, reject) => {
@@ -139,6 +238,14 @@ MyPromise.resolve = (value) => {
         }else {
             resolve(value)
         }
+    })
+}
+MyPromise.reject = function (reason) {
+    /**
+     * 与resolve不一样，并不会因为传入的reason是promise而改变逻辑
+     */
+    return new MyPromise(function (resolve, reject) {
+        reject(reason)
     })
 }
   
@@ -190,27 +297,6 @@ MyPromise.deferred = function() {
 // then2
 // then3
 // then4
-
-
-
-
-// let promise1 = new MyPromise(resolve => {
-//     let promise2 = new MyPromise(resolve => {
-//         resolve() 
-//     })
-//     promise2.then(() => console.log('inner then'))
-//     resolve(promise2) 
-// })
-// promise1.then(() => console.log('outter then'))
-
-// let a = new MyPromise(resolve => {
-//     setTimeout(() => {
-//         resolve(1234)
-//     },0)
-// })
-// a.then(null).then(v => {
-//     console.log(v)
-// })
 
 /**
  * 测试可以打开这个语句
