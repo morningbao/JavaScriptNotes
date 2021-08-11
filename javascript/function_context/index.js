@@ -58,7 +58,7 @@ function initContext(curContext ,lastContext) {
         }
         var curAO = lastContext.AO || lastContext.VO
         var Scope = curAO['currentFunctionName']['[[scope]]'] // 取父级上下文里，当前方法的[[scope]]属性
-        Scope.shift(AO)
+        Scope.unshift(AO)
         curContext.AO = AO
         curContext.Scope = Scope
         curContext.this = AO
